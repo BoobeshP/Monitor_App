@@ -4,14 +4,24 @@ pipeline {
     environment {
         VENV = "venv"
     }
+stage('Checkout') {
+    steps {
+        checkout scm
+        script {
+            BUILD_BRANCH = sh(
+                script: '''
+                git branch -r --contains HEAD | sed 's|origin/||' | head -n 1
+                ''',
+                returnStdout: true
+            ).trim()
 
-    stages {
-
-        stage('Checkout') {
-            steps {
-                checkout scm
+            if (!BUILD_BRANCH) {
+                BUILD_BRANCH = "unknown"
             }
         }
+        echo "🔹 Building branch: ${BUILD_BRANCH}"
+    }
+}
 
         stage('Install OS Dependencies') {
             steps {
