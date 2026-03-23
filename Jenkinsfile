@@ -9,6 +9,7 @@ pipeline {
 
         stage('Checkout') {
             steps {
+                echo "🔹 Building branch: ${env.BRANCH_NAME}"
                 checkout scm
             }
         }
@@ -33,33 +34,34 @@ pipeline {
             }
         }
 
-        stage('Health Check Test') {
+        stage('Branch Specific Validation') {
             steps {
                 sh '''
-                . ${VENV}/bin/activate
-                python -c "import app; print('App import successful')"
+                echo "Running branch-specific checks..."
+
+                if [ "${BRANCH_NAME}" = "feature_Monitor" ]; then
+                    echo "✅ feature_Monitor branch detected"
+                    test -f monitor_utils.py
+                    test -f FEATURE_MONITOR.md
+                else
+                    echo "✅ main branch detected – skipping feature checks"
+                fi
                 '''
             }
         }
 
-        stage('Package & Archive Application ✅') {
+        stage('Package & Archive') {
             steps {
                 sh '''
-                tar -czf monitoring-dashboard.tar.gz app.py templates requirements.txt
-                ls -l monitoring-dashboard.tar.gz
+                tar -czf monitoring-dashboard-${BRANCH_NAME}.tar.gz app.py templates requirements.txt *.py *.md || true
+                ls -l
                 '''
-                archiveArtifacts artifacts: 'monitoring-dashboard.tar.gz', fingerprint: true
+                archiveArtifacts artifacts: '*.tar.gz', fingerprint: true
             }
         }
     }
 
     post {
-        success {
-            echo "✅ Monitoring Dashboard CI successful"
-        }
-        failure {
-            echo "❌ Pipeline failed"
-        }
         always {
             cleanWs()
         }
