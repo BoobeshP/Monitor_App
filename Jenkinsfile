@@ -6,7 +6,7 @@ pipeline {
         BUILD_BRANCH = "unknown"
     }
 
-    stages {
+       stages {
 
         stage('Checkout') {
             steps {
@@ -20,6 +20,7 @@ pipeline {
                 echo "🔹 Building branch: ${BUILD_BRANCH}"
             }
         }
+
 
         stage('Install OS Dependencies') {
             steps {
