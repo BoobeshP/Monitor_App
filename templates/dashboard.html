@@ -1,0 +1,50 @@
+cat << 'EOF' > templates/dashboard.html
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Application Monitoring Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f8;
+            padding: 30px;
+        }
+        h1 {
+            color: #333;
+        }
+        .card {
+            background: white;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+
+<h1>📊 Application Monitoring Dashboard</h1>
+
+<div class="card">
+    <strong>Hostname:</strong> {{ data.hostname }}
+</div>
+
+<div class="card">
+    <strong>CPU Usage:</strong> {{ data.cpu }} %
+</div>
+
+<div class="card">
+    <strong>Memory Usage:</strong> {{ data.memory }} %
+</div>
+
+<div class="card">
+    <strong>Disk Usage:</strong> {{ data.disk }} %
+</div>
+
+<div class="card">
+    <strong>Application Uptime:</strong> {{ data.uptime }}
+</div>
+
+</body>
+</html>
+EOF
