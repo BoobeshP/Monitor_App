@@ -2,6 +2,7 @@ from flask import Flask, jsonify, render_template
 import psutil
 import socket
 import time
+from monitor_utils import extended_metrics
 
 app = Flask(__name__)
 
@@ -35,6 +36,9 @@ def metrics():
         disk_usage=psutil.disk_usage('/').percent,
         uptime=get_uptime()
     )
+@app.route("/extended-metrics")
+def extended():
+    return extended_metrics()
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
