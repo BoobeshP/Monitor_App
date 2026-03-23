@@ -3,14 +3,21 @@ pipeline {
 
     environment {
         VENV = "venv"
+        BUILD_BRANCH = "unknown"
     }
 
     stages {
 
         stage('Checkout') {
             steps {
-                echo "🔹 Building branch: ${env.BRANCH_NAME}"
                 checkout scm
+                script {
+                    BUILD_BRANCH = sh(
+                        script: "git rev-parse --abbrev-ref HEAD",
+                        returnStdout: true
+                    ).trim()
+                }
+                echo "🔹 Building branch: ${BUILD_BRANCH}"
             }
         }
 
@@ -39,10 +46,8 @@ pipeline {
                 sh '''
                 echo "Running branch-specific checks..."
 
-                if [ "${BRANCH_NAME}" = "feature_Monitor" ]; then
+                if [ "${BUILD_BRANCH}" = "feature_Monitor" ]; then
                     echo "✅ feature_Monitor branch detected"
-                    test -f monitor_utils.py
-                    test -f FEATURE_MONITOR.md
                 else
                     echo "✅ main branch detected – skipping feature checks"
                 fi
@@ -53,8 +58,8 @@ pipeline {
         stage('Package & Archive') {
             steps {
                 sh '''
-                tar -czf monitoring-dashboard-${BRANCH_NAME}.tar.gz app.py templates requirements.txt *.py *.md || true
-                ls -l
+                tar -czf monitoring-dashboard-${BUILD_BRANCH}.tar.gz app.py templates requirements.txt
+                ls -l monitoring-dashboard-${BUILD_BRANCH}.tar.gz
                 '''
                 archiveArtifacts artifacts: '*.tar.gz', fingerprint: true
             }
