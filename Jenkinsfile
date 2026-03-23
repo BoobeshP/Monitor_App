@@ -42,11 +42,13 @@ pipeline {
             }
         }
 
-        stage('Package Application') {
+        stage('Package & Archive Application ✅') {
             steps {
                 sh '''
                 tar -czf monitoring-dashboard.tar.gz app.py templates requirements.txt
+                ls -l monitoring-dashboard.tar.gz
                 '''
+                archiveArtifacts artifacts: 'monitoring-dashboard.tar.gz', fingerprint: true
             }
         }
     }
@@ -54,7 +56,6 @@ pipeline {
     post {
         success {
             echo "✅ Monitoring Dashboard CI successful"
-            archiveArtifacts artifacts: 'monitoring-dashboard.tar.gz', fingerprint: true
         }
         failure {
             echo "❌ Pipeline failed"
@@ -64,4 +65,3 @@ pipeline {
         }
     }
 }
-
